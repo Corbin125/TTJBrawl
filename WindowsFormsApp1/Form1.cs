@@ -22,15 +22,18 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
+        
+        SheetsService sheetsService;
+        
+        string spreadsheetId = "1nITN-NKCSODuR4LLJGuqBKyrf47lmvCYiRl7oCe453U";
         string range = "A2:H";
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
-        //static string ApplicationName = "TableTop Brawl";
-        public void Form1_Load(object sender, EventArgs e)
+        public void NotMain()
         {
             UserCredential credential;
 
             using (var stream =
-                new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+                new FileStream("client_secret.json", FileMode.Open, FileAccess.ReadWrite))
             {
                 string credPath = System.Environment.GetFolderPath(
                     System.Environment.SpecialFolder.Personal);
@@ -42,10 +45,48 @@ namespace WindowsFormsApp1
                     "user",
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
-                Console.WriteLine("Credential file saved to: " + credPath);
+
             }
 
-            SheetsService sheetsService = new SheetsService(new BaseClientService.Initializer
+            sheetsService = new SheetsService(new BaseClientService.Initializer
+            {
+                HttpClientInitializer = GetCredential(),
+                ApplicationName = "TableTop Brawl",
+                ApiKey = "AIzaSyCnF3u6zTn4U2PE-ypGNIB154Ko5Cbeet4",
+            });
+            // Spreadsheet to request
+            string spreadsheetId = "1nITN-NKCSODuR4LLJGuqBKyrf47lmvCYiRl7oCe453U";
+            // Range of cells
+            List<string> ranges = new List<string>();  // TODO: Update placeholder value.
+            // Grid Data
+            bool includeGridData = false;
+
+            SpreadsheetsResource.GetRequest request = sheetsService.Spreadsheets.Get(spreadsheetId);
+            request.Ranges = ranges;
+            request.IncludeGridData = includeGridData;
+        }
+        //static string ApplicationName = "TableTop Brawl";
+        /*public void Form1_Load(object sender, EventArgs e)
+        {
+            UserCredential credential;
+
+            using (var stream =
+                new FileStream("client_secret.json", FileMode.Open, FileAccess.ReadWrite))
+            {
+                string credPath = System.Environment.GetFolderPath(
+                    System.Environment.SpecialFolder.Personal);
+                credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
+
+                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true)).Result;
+                
+            }
+
+            sheetsService = new SheetsService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = GetCredential(),
                 ApplicationName = "TableTop Brawl",
@@ -63,7 +104,7 @@ namespace WindowsFormsApp1
 
 
 
-        }
+        }**/
 
         public static UserCredential GetCredential()
         {
@@ -96,6 +137,7 @@ namespace WindowsFormsApp1
         // Button 1 "Confirm" 
         private void button1_Click(object sender, EventArgs e) //TODO: have this send input to spreadsheet
         {
+            NotMain();
             // prints inputs to text box for testing
             playerName = txt_playerName.Text;
             characterName = txt_characterName.Text;
@@ -111,9 +153,11 @@ namespace WindowsFormsApp1
 
         
 
-        private void button2_Click(object sender, EventArgs e) //TODO: have this read spreadsheet for fights
+        private void button2_Click(object sender, EventArgs e) 
         {
-
+            NotMain();
+            
+            
             SpreadsheetsResource.ValuesResource.GetRequest.ValueRenderOptionEnum valueRenderOption = (SpreadsheetsResource.ValuesResource.GetRequest.ValueRenderOptionEnum)0;
             SpreadsheetsResource.ValuesResource.GetRequest.DateTimeRenderOptionEnum dateTimeRenderOption = (SpreadsheetsResource.ValuesResource.GetRequest.DateTimeRenderOptionEnum)0;  // TODO: Update placeholder value.
 
@@ -122,8 +166,13 @@ namespace WindowsFormsApp1
             request.DateTimeRenderOption = dateTimeRenderOption;
 
             Data.ValueRange response = request.Execute();
-            Random rand = new Random();
-            int i = rand.Next(1, );
+
+            String[][] valueArray = (JsonConvert.SerializeObject(response.Values));
+            /*Random rand = new Random();
+            int r = rand.Next(0, length);
+            int r2 = rand.Next(0, length);**/
+
+            txt_fightOutput.Text += (JsonConvert.SerializeObject(response.Values));
         }
 
 

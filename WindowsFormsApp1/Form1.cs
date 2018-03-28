@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 
 namespace WindowsFormsApp1
 {
+    
     public partial class Form1 : Form
     {
         
@@ -151,13 +152,14 @@ namespace WindowsFormsApp1
             
         }
 
+        Dictionary<string, Character> characters;
         
 
-        private void button2_Click(object sender, EventArgs e) 
+        private void button2_Click(object sender, EventArgs e)
         {
             NotMain();
-            
-            
+
+
             SpreadsheetsResource.ValuesResource.GetRequest.ValueRenderOptionEnum valueRenderOption = (SpreadsheetsResource.ValuesResource.GetRequest.ValueRenderOptionEnum)0;
             SpreadsheetsResource.ValuesResource.GetRequest.DateTimeRenderOptionEnum dateTimeRenderOption = (SpreadsheetsResource.ValuesResource.GetRequest.DateTimeRenderOptionEnum)0;  // TODO: Update placeholder value.
 
@@ -166,23 +168,36 @@ namespace WindowsFormsApp1
             request.DateTimeRenderOption = dateTimeRenderOption;
 
             Data.ValueRange response = request.Execute();
-            String valueString = (JsonConvert.SerializeObject(response.Values));
-            valueString = Regex.Replace(valueString, "[\\[\"]", "");
-            String[] valueArray = valueString.Split(new String[] { "]" }, StringSplitOptions.None);
-            //String[] characterArray;
-            foreach (String element in valueArray)
+            characters = new Dictionary<string, Character>();
+            foreach (var character in response.Values)
             {
-                //String[] elements = element.Split(new String[] { "," }, StringSplitOptions.None);
-                var characterArray = valueArray.Select(y => element.Split(new[] { ',' })).ToArray();
+                string player = character[0] as string;
+                string name = character[1] as string;
+                string race = character[2] as string;
+                int str = Convert.ToInt32(character[3]);
+                int dex = Convert.ToInt32(character[4]);
+                int intellegence = Convert.ToInt32(character[5]);
+                int level = Convert.ToInt32(character[6]);
+                int exp = Convert.ToInt32(character[7]);
+                characters.Add(name, new Character(name, player, race, str, dex, intellegence, level, exp));
             }
+            
+            /*int total = characterArray.GetLength;
 
-            /*Random rand = new Random();
-            int r = rand.Next(0, length);
-            int r2 = rand.Next(0, length);**/
+            Random rand = new Random();
+            int r = rand.Next(0, total);
+            int r2 = rand.Next(0, total);
 
-            txt_fightOutput.Text += valueArray[0][1];//(JsonConvert.SerializeObject(response.Values));
+            txt_fightOutput.Text += total;
+            int indices = 0;
+            foreach (Array character in characterArray)
+            {
+                indices += 1;
+            }
+            txt_fightOutput.Text += indices;**/
+            //txt_fightOutput.Text += characterArray[r][2] + " vs " + characterArray[r2][2];
+            
         }
-
 
         
     }

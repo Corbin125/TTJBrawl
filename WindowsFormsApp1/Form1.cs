@@ -16,7 +16,7 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using Data = Google.Apis.Sheets.v4.Data;
-
+using System.Text.RegularExpressions;
 
 namespace WindowsFormsApp1
 {
@@ -166,16 +166,24 @@ namespace WindowsFormsApp1
             request.DateTimeRenderOption = dateTimeRenderOption;
 
             Data.ValueRange response = request.Execute();
+            String valueString = (JsonConvert.SerializeObject(response.Values));
+            valueString = Regex.Replace(valueString, "[\\[\"]", "");
+            String[] valueArray = valueString.Split(new String[] { "]" }, StringSplitOptions.None);
+            //String[] characterArray;
+            foreach (String element in valueArray)
+            {
+                //String[] elements = element.Split(new String[] { "," }, StringSplitOptions.None);
+                var characterArray = valueArray.Select(y => element.Split(new[] { ',' })).ToArray();
+            }
 
-            String[][] valueArray = (JsonConvert.SerializeObject(response.Values));
             /*Random rand = new Random();
             int r = rand.Next(0, length);
             int r2 = rand.Next(0, length);**/
 
-            txt_fightOutput.Text += (JsonConvert.SerializeObject(response.Values));
+            txt_fightOutput.Text += valueArray[0][1];//(JsonConvert.SerializeObject(response.Values));
         }
 
 
-
+        
     }
 }

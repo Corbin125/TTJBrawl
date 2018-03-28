@@ -25,7 +25,7 @@ namespace WindowsFormsApp1
     {
         
         SheetsService sheetsService;
-        
+        Dictionary<string, Character> characters;
         string spreadsheetId = "1nITN-NKCSODuR4LLJGuqBKyrf47lmvCYiRl7oCe453U";
         string range = "A2:H";
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
@@ -67,45 +67,7 @@ namespace WindowsFormsApp1
             request.IncludeGridData = includeGridData;
         }
         //static string ApplicationName = "TableTop Brawl";
-        /*public void Form1_Load(object sender, EventArgs e)
-        {
-            UserCredential credential;
-
-            using (var stream =
-                new FileStream("client_secret.json", FileMode.Open, FileAccess.ReadWrite))
-            {
-                string credPath = System.Environment.GetFolderPath(
-                    System.Environment.SpecialFolder.Personal);
-                credPath = Path.Combine(credPath, ".credentials/sheets.googleapis.com-dotnet-quickstart.json");
-
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-                
-            }
-
-            sheetsService = new SheetsService(new BaseClientService.Initializer
-            {
-                HttpClientInitializer = GetCredential(),
-                ApplicationName = "TableTop Brawl",
-            });
-            // Spreadsheet to request
-            string spreadsheetId = "1nITN-NKCSODuR4LLJGuqBKyrf47lmvCYiRl7oCe453U";
-            // Range of cells
-            List<string> ranges = new List<string>();  // TODO: Update placeholder value.
-            // Grid Data
-            bool includeGridData = false;
-
-            SpreadsheetsResource.GetRequest request = sheetsService.Spreadsheets.Get(spreadsheetId);
-            request.Ranges = ranges;
-            request.IncludeGridData = includeGridData;
-
-
-
-        }**/
+        
 
         public static UserCredential GetCredential()
         {
@@ -124,36 +86,44 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
         }
-        // defining variables for characters
-        string playerName = null;
-        string characterName = null;
-        string race = null;
-        int strength = 0;
-        int intelligence = 0;
-        int dexterity = 0;
-        int level = 1;
-        int experience = 0;
+        
         
         
         // Button 1 "Confirm" 
         private void button1_Click(object sender, EventArgs e) //TODO: have this send input to spreadsheet
         {
             NotMain();
-            // prints inputs to text box for testing
-            playerName = txt_playerName.Text;
-            characterName = txt_characterName.Text;
-            race = txt_race.Text;
-            strength = Int32.Parse(txt_strength.Text);
-            intelligence = Int32.Parse(txt_intelligence.Text);
-            dexterity = Int32.Parse(txt_dexterity.Text);
-            txt_test.Text += playerName + "\r\n" + characterName + "\r\n" + race + "\r\n" + strength +
-                "\r\n" + intelligence + "\r\n" + dexterity + "\r\n" + "\r\n";
+            string player = txt_playerName.Text as string;
+            string name = txt_characterName.Text as string;
+            string race = txt_race.Text as string;
+            int str = Convert.ToInt32(txt_strength.Text);
+            int dex = Convert.ToInt32(txt_dexterity.Text);
+            int intellegence = Convert.ToInt32(txt_intelligence.Text);
+            int level = 1;
+            int exp = 0;
+            characters.Add(name, new Character(name, player, race, str, dex, intellegence, level, exp));
 
             
+
+            SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum valueInputOption = (SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum)0;  // TODO: Update placeholder value.
+
+            // How the input data should be inserted.
+            SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum insertDataOption = (SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum)0;  // TODO: Update placeholder value.
+            
+            // TODO: Assign values to desired properties of `requestBody`:
+            Data.ValueRange requestBody = new Data.ValueRange();
+            requestBody.Values = characters;
+            SpreadsheetsResource.ValuesResource.AppendRequest request = sheetsService.Spreadsheets.Values.Append(requestBody, spreadsheetId, range);
+            request.ValueInputOption = valueInputOption;
+            request.InsertDataOption = insertDataOption;
+
+            // To execute asynchronously in an async method, replace `request.Execute()` as shown:
+            Data.AppendValuesResponse response = request.Execute();
+
         }
 
-        Dictionary<string, Character> characters;
-        
+
+
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -181,21 +151,14 @@ namespace WindowsFormsApp1
                 int exp = Convert.ToInt32(character[7]);
                 characters.Add(name, new Character(name, player, race, str, dex, intellegence, level, exp));
             }
-            
-            /*int total = characterArray.GetLength;
+
+            int numChars = characters.Count - 1;
 
             Random rand = new Random();
-            int r = rand.Next(0, total);
-            int r2 = rand.Next(0, total);
+            int r = rand.Next(0, numChars);
+            int r2 = rand.Next(0, numChars);
 
-            txt_fightOutput.Text += total;
-            int indices = 0;
-            foreach (Array character in characterArray)
-            {
-                indices += 1;
-            }
-            txt_fightOutput.Text += indices;**/
-            //txt_fightOutput.Text += characterArray[r][2] + " vs " + characterArray[r2][2];
+            
             
         }
 

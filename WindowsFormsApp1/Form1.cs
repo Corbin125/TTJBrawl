@@ -112,7 +112,21 @@ namespace WindowsFormsApp1
             
             // TODO: Assign values to desired properties of `requestBody`:
             Data.ValueRange requestBody = new Data.ValueRange();
-            requestBody.Values = characters;
+            var characterResponses = new List<IList<Object>>();
+            foreach (var character in characters)
+            {
+                var characterResponse = new List<object>();
+                characterResponse.Add(character.Value.charName);
+                characterResponse.Add(character.Value.plyrName);
+                characterResponse.Add(character.Value.strength.ToString());
+                characterResponse.Add(character.Value.intelligence.ToString());
+                characterResponse.Add(character.Value.dexterity.ToString());
+                characterResponse.Add(character.Value.level.ToString());
+                characterResponse.Add(character.Value.xp.ToString());
+
+                characterResponses.Add(characterResponse);
+            }
+            requestBody.Values = characterResponses;
             SpreadsheetsResource.ValuesResource.AppendRequest request = sheetsService.Spreadsheets.Values.Append(requestBody, spreadsheetId, range);
             request.ValueInputOption = valueInputOption;
             request.InsertDataOption = insertDataOption;

@@ -20,15 +20,13 @@ using System.Text.RegularExpressions;
 
 namespace WindowsFormsApp1
 {
-    
     public partial class Form1 : Form
-    {
-        
+    {        
         SheetsService sheetsService;
         Dictionary<string, Character> characters;
         string spreadsheetId = "1nITN-NKCSODuR4LLJGuqBKyrf47lmvCYiRl7oCe453U";
         string range = "A2:H";
-        static string[] Scopes = { SheetsService.Scope.Spreadsheets };
+        static string[] Scopes = { SheetsService.Scope.DriveFile };
         public void NotMain()
         {
             UserCredential credential;
@@ -51,7 +49,7 @@ namespace WindowsFormsApp1
 
             sheetsService = new SheetsService(new BaseClientService.Initializer
             {
-                HttpClientInitializer = GetCredential(),
+                HttpClientInitializer = credential,
                 ApplicationName = "TableTop Brawl",
                 ApiKey = "AIzaSyCnF3u6zTn4U2PE-ypGNIB154Ko5Cbeet4",
             });
@@ -85,6 +83,7 @@ namespace WindowsFormsApp1
         public Form1()
         {
             InitializeComponent();
+            characters = new Dictionary<string, Character>();
         }
         
         
@@ -93,6 +92,7 @@ namespace WindowsFormsApp1
         private void button1_Click(object sender, EventArgs e) //TODO: have this send input to spreadsheet
         {
             NotMain();
+            
             string player = txt_playerName.Text as string;
             string name = txt_characterName.Text as string;
             string race = txt_race.Text as string;
@@ -152,7 +152,7 @@ namespace WindowsFormsApp1
             request.DateTimeRenderOption = dateTimeRenderOption;
 
             Data.ValueRange response = request.Execute();
-            characters = new Dictionary<string, Character>();
+            //characters = new Dictionary<string, Character>();
             foreach (var character in response.Values)
             {
                 string player = character[0] as string;
